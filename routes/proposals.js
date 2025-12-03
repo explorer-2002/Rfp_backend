@@ -26,6 +26,11 @@ router.post('/', async (req, res) => {
         const payload = req.body;
 
         if (payload.type === 'email.received') {
+            logtail.info("Received email", {
+                message: "Email",
+                data: payload?.data
+            });
+
             const email = payload.data;
 
             const sender = email.from;
@@ -42,13 +47,13 @@ router.post('/', async (req, res) => {
             });
         }
 
-        } catch (error) {
-            console.error('Error fetching proposal:', error);
-            return res.status(500).json({
-                message: 'Error receiving proposal email',
-                error: error.message
-            });
-        }
-    });
+    } catch (error) {
+        console.error('Error fetching proposal:', error);
+        return res.status(500).json({
+            message: 'Error receiving proposal email',
+            error: error.message
+        });
+    }
+});
 
 export default router;
