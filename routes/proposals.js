@@ -26,6 +26,11 @@ router.post('/', async (req, res) => {
         const payload = req.body;
 
         if (payload.type === 'email.received') {
+            await Proposals.create({
+                cost: 50000,
+                deliveryDate: new Date().toISOString(),
+            });
+
             logtail.info("Received email", {
                 message: "Email",
                 data: payload?.data
