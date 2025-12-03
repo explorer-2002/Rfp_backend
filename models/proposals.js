@@ -20,4 +20,4 @@ const proposalSchema = new mongoose.Schema({
     timestamps: true
 });
 
-export const Rfp = mongoose.model('Proposal', proposalSchema);
+export const Proposals = mongoose.model('Proposal', proposalSchema);

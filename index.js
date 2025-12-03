@@ -1,6 +1,7 @@
 import express from 'express';
 import createRpfRouter from './routes/create-rfp.js';
 import vendorRouter from './routes/vendors.js';
+import proposalRouter from './routes/proposals.js';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/create-rfp', createRpfRouter);
 app.use('/api/vendors', vendorRouter);
+app.use('/api/proposals', proposalRouter);
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server is running' });
