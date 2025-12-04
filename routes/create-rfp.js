@@ -68,4 +68,22 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const rfp = await Rfp.findById(id)?.lean() || {};
+
+        return res.status(201).json({
+            message: 'RFP data fetched successfully',
+            data: rfp
+        });
+    } catch (error) {
+        console.error('Error fetching RFP with given id:', error);
+        return res.status(500).json({
+            message: 'Error fetching RFP data',
+            error: error.message
+        });
+    }
+});
+
 export default router;
