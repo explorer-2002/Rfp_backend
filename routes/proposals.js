@@ -57,12 +57,17 @@ router.post('/', async (req, res) => {
                 data: payload?.data
             });
 
-            const email = payload.data;
+            const email = payload?.data;
 
-            const sender = email.from;
-            const subject = email.subject;
-            const textBody = email.text; // or email.html
-            const attachments = email.attachments;
+            const sender = email?.from;
+            const subject = email?.subject;
+            const textBody = email?.text; // or email.html
+            const attachments = email?.attachments;
+
+            console.log('Email received:', email);
+            console.log('Text Body:', email?.text);
+            console.log('HTML Body:', email?.html);
+            console.log('Subject', email?.subject);
 
             const proposalObject = await getProposalDetailsFromEmail(textBody);
 
