@@ -1,6 +1,7 @@
 import express from 'express';
 import { Proposals } from '../models/proposals.js';
 import { systemPromptForAnalyzingProposalEmail } from '../helpers/systemPrompts.js';
+import { logtail } from '../helpers/logger.js';
 
 const router = express.Router();
 
