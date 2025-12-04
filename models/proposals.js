@@ -20,6 +20,11 @@ const proposalSchema = new mongoose.Schema({
         required: true
     },
 
+    cost: {
+        type: Number,
+        required: true
+    },
+
     emailBody: {
         type: String,
         required: true
@@ -29,7 +34,7 @@ const proposalSchema = new mongoose.Schema({
         filename: String,
         extractedText: String
     }],
-    
+
     aiAnalysis: {
         score: Number,
         summary: String
