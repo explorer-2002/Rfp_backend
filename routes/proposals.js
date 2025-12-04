@@ -86,13 +86,13 @@ router.post('/', async (req, res) => {
             const fullEmail = await fetchFullEmailFromResend(email?.email_id);
             console.log('Full email fetched from Resend:', fullEmail);
 
-            // const proposalObject = await getProposalDetailsFromEmail(fullEmail?.text);
+            const proposalObject = await getProposalDetailsFromEmail(fullEmail?.html);
 
-            // console.log('Extracted Proposal Object:', proposalObject);
-            // await Proposals.create({
-            //     emailBody: textBody,
-            //     ...proposalObject
-            // });
+            console.log('Extracted Proposal Object:', proposalObject);
+            await Proposals.create({
+                emailBody: textBody,
+                ...proposalObject
+            });
 
             return res.status(201).json({
                 message: 'Proposal data saved successfully',
