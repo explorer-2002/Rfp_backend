@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 import dotenv from 'dotenv';
-import { getEmailTemplate } from './sendingEmailTemplate.js';
+import { getEmailTemplate, getEmailTemplateForPlacingOrder } from './sendingEmailTemplate.js';
 
 dotenv.config();
 
