@@ -5,6 +5,7 @@ import { logtail } from '../helpers/logger.js';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { resend } from '../helpers/sendEmails.js';
+import { Rfp } from '../models/rfp.js';
 
 dotenv.config();
 
@@ -73,26 +74,28 @@ router.post('/', async (req, res) => {
 
             const email = payload?.data;
 
-            const sender = email?.from;
-            const subject = email?.subject;
-            const textBody = email?.text; // or email.html
-            const attachments = email?.attachments;
-
-            console.log('Email received:', email);
-            console.log('Text Body:', email?.text);
-            console.log('HTML Body:', email?.html);
-            console.log('Subject', email?.subject);
-
             const fullEmail = await fetchFullEmailFromResend(email?.email_id);
             console.log('Full email fetched from Resend:', fullEmail);
 
             const proposalObject = await getProposalDetailsFromEmail(fullEmail?.html);
 
             console.log('Extracted Proposal Object:', proposalObject);
-            await Proposals.create({
+            const savedProposal = await Proposals.create({
                 emailBody: fullEmail?.text,
                 ...proposalObject
             });
+
+            if (savedProposal?.id) {
+                await Rfp.findOneAndUpdate(
+                    {},
+                    {
+                        $push: {
+                            proposalIds: savedProposal.id.toString()
+                        }
+                    },
+                    { new: true }
+                );
+            }
 
             return res.status(201).json({
                 message: 'Proposal data saved successfully',

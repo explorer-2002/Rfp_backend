@@ -26,7 +26,7 @@ const rfpSchema = new mongoose.Schema({
     required: true
   },
   proposalIds: {
-    type: [Number],
+    type: [String],
     default: []
   }
 }, {
