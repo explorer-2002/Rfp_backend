@@ -9,6 +9,41 @@ dotenv.config();
 
 const router = express.Router();
 
+const fetchFullEmailFromResend = async (emailId) => {
+    try {
+        console.log(`Fetching email content for ID: ${emailId}`);
+        
+        const response = await fetch(`https://api.resend.com/emails/${emailId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Resend API error response:', errorText);
+            throw new Error(`Resend API error: ${response?.status} - ${errorText}`);
+        }
+
+        const emailData = await response.json();
+        console.log('Full email data received from Resend:', {
+            id: emailData?.id,
+            subject: emailData?.subject,
+            hasText: !!emailData?.text,
+            hasHtml: !!emailData?.html,
+            textLength: emailData?.text?.length || 0,
+            htmlLength: emailData?.html?.length || 0
+        });
+
+        return emailData;
+    } catch (error) {
+        console.error('Error fetching email from Resend:', error);
+        return {};
+    }
+};
+
 const getProposalDetailsFromEmail = async (emailData) => {
     const ai = new GoogleGenAI({
         apiKey: process.env.GEMINI_API_KEY
@@ -69,7 +104,8 @@ router.post('/', async (req, res) => {
             console.log('HTML Body:', email?.html);
             console.log('Subject', email?.subject);
 
-            const proposalObject = await getProposalDetailsFromEmail(textBody);
+            const fullEmail = await fetchFullEmailFromResend(email?.email_id);
+            const proposalObject = await getProposalDetailsFromEmail(fullEmail?.text);
 
             await Proposals.create({
                 emailBody: textBody,
