@@ -20,6 +20,10 @@ const proposalSchema = new mongoose.Schema({
         required: true
     },
 
+    dateForPayment: {
+        type: Date
+    },
+
     cost: {
         type: Number,
         required: true
