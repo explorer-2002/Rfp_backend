@@ -2,6 +2,10 @@ import express from 'express';
 import { Proposals } from '../models/proposals.js';
 import { systemPromptForAnalyzingProposalEmail } from '../helpers/systemPrompts.js';
 import { logtail } from '../helpers/logger.js';
+import dotenv from 'dotenv';
+import { GoogleGenAI } from '@google/genai';
+
+dotenv.config();
 
 const router = express.Router();
 
