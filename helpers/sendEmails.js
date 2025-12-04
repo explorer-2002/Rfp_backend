@@ -5,7 +5,7 @@ import { getEmailTemplate } from './sendingEmailTemplate.js';
 dotenv.config();
 
 // 2. Initialize Resend with your key
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendEmails = async (emails, rfpObject) => {
   try {

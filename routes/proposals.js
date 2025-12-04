@@ -4,6 +4,7 @@ import { systemPromptForAnalyzingProposalEmail } from '../helpers/systemPrompts.
 import { logtail } from '../helpers/logger.js';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
+import { resend } from '../helpers/sendEmails.js';
 
 dotenv.config();
 
@@ -11,33 +12,11 @@ const router = express.Router();
 
 const fetchFullEmailFromResend = async (emailId) => {
     try {
-        console.log(`Fetching email content for ID: ${emailId}`);
-        
-        const response = await fetch(`https://api.resend.com/emails/${emailId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        });
+        const { data } = await resend.emails.receiving.get(emailId);
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Resend API error response:', errorText);
-            throw new Error(`Resend API error: ${response?.status} - ${errorText}`);
-        }
+        console.log('Fetched email data from Resend:', data);
+        return data;
 
-        const emailData = await response.json();
-        console.log('Full email data received from Resend:', {
-            id: emailData?.id,
-            subject: emailData?.subject,
-            hasText: !!emailData?.text,
-            hasHtml: !!emailData?.html,
-            textLength: emailData?.text?.length || 0,
-            htmlLength: emailData?.html?.length || 0
-        });
-
-        return emailData;
     } catch (error) {
         console.error('Error fetching email from Resend:', error);
         return {};
@@ -105,16 +84,19 @@ router.post('/', async (req, res) => {
             console.log('Subject', email?.subject);
 
             const fullEmail = await fetchFullEmailFromResend(email?.email_id);
-            const proposalObject = await getProposalDetailsFromEmail(fullEmail?.text);
+            console.log('Full email fetched from Resend:', fullEmail);
 
-            await Proposals.create({
-                emailBody: textBody,
-                ...proposalObject
-            });
+            // const proposalObject = await getProposalDetailsFromEmail(fullEmail?.text);
+
+            // console.log('Extracted Proposal Object:', proposalObject);
+            // await Proposals.create({
+            //     emailBody: textBody,
+            //     ...proposalObject
+            // });
 
             return res.status(201).json({
                 message: 'Proposal data saved successfully',
-                data: proposalObject
+                data: []
             });
         }
 
