@@ -90,7 +90,7 @@ router.post('/', async (req, res) => {
 
             console.log('Extracted Proposal Object:', proposalObject);
             await Proposals.create({
-                emailBody: textBody,
+                emailBody: fullEmail?.text,
                 ...proposalObject
             });
 
