@@ -1,7 +1,27 @@
 import express from 'express';
 import { Proposals } from '../models/proposals.js';
+import { systemPromptForAnalyzingProposalEmail } from '../helpers/systemPrompts.js';
 
 const router = express.Router();
+
+const getProposalDetailsFromEmail = async (emailData) => {
+    const ai = new GoogleGenAI({
+        apiKey: process.env.GEMINI_API_KEY
+    });
+
+    const result = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        config: {
+            thinkingConfig: {
+                thinkingBudget: 0,
+            },
+            systemInstruction: systemPromptForAnalyzingProposalEmail
+        },
+        contents: emailData
+    });
+
+    return JSON.parse(result.text.substring(13, result.text.length - 3));
+};
 
 router.get('/:id', async (req, res) => {
     try {
@@ -26,10 +46,6 @@ router.post('/', async (req, res) => {
         const payload = req.body;
 
         if (payload.type === 'email.received') {
-            await Proposals.create({
-                cost: 50000,
-                deliveryDate: new Date().toISOString(),
-            });
 
             logtail.info("Received email", {
                 message: "Email",
@@ -43,19 +59,23 @@ router.post('/', async (req, res) => {
             const textBody = email.text; // or email.html
             const attachments = email.attachments;
 
-            console.log(`Received email from ${sender}: ${subject}`);
-            console.log(`Body: ${textBody}`);
-            console.log(`Attachments: ${attachments.length} files`);
+            const proposalObject = await getProposalDetailsFromEmail(textBody);
+
+            await Proposals.create({
+                emailBody: textBody,
+                ...proposalObject
+            });
 
             return res.status(201).json({
-                status: "ok",
+                message: 'Proposal data saved successfully',
+                data: proposalObject
             });
         }
 
     } catch (error) {
         console.error('Error fetching proposal:', error);
         return res.status(500).json({
-            message: 'Error receiving proposal email',
+            message: 'Error saving proposal data',
             error: error.message
         });
     }

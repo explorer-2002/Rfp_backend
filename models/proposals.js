@@ -1,21 +1,40 @@
 import mongoose from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 const proposalSchema = new mongoose.Schema({
     id: {
-        type: Number,
+        type: String,
         required: true,
-        default: () => Math.floor(Math.random() * 10)
+        unique: true,
+        default: () => uuidv4()
     },
 
-    cost: {
-        type: Number,
-        required: true
+    sender: {
+        type: String,
+        required: true,
+        unique: true
     },
 
     deliveryDate: {
         type: Date,
         required: true
+    },
+
+    emailBody: {
+        type: String,
+        required: true
+    },
+
+    attachmentsData: [{
+        filename: String,
+        extractedText: String
+    }],
+    
+    aiAnalysis: {
+        score: Number,
+        summary: String
     }
+
 }, {
     timestamps: true
 });

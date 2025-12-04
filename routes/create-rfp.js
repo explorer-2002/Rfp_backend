@@ -1,9 +1,9 @@
 import express from 'express';
 import { GoogleGenAI } from "@google/genai";
-import { systemPrompt } from '../helpers/systemPrompt.js';
 import { Rfp } from '../models/rfp.js';
 import { sendEmails } from '../helpers/sendEmails.js';
 import { Vendor } from '../models/vendors.js';
+import { systemPromptForExtractingRfpDetails } from '../helpers/systemPrompts.js';
 
 const router = express.Router();
 
@@ -18,7 +18,7 @@ const getRfpJsonFromUserPrompt = async (userPrompt) => {
             thinkingConfig: {
                 thinkingBudget: 0,
             },
-            systemInstruction: systemPrompt
+            systemInstruction: systemPromptForExtractingRfpDetails
         },
         contents: userPrompt
     });
