@@ -4,7 +4,7 @@ import { systemPromptForAnalyzingProposalEmail } from '../helpers/systemPrompts.
 import { logtail } from '../helpers/logger.js';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
-import { resend } from '../helpers/sendEmails.js';
+import { resend, sendEmailForConfirmingOrder } from '../helpers/sendEmails.js';
 import { Rfp } from '../models/rfp.js';
 
 dotenv.config();
@@ -110,5 +110,31 @@ router.post('/', async (req, res) => {
         });
     }
 });
+
+router.post('/placeOrder/:id', async (req, res) => {
+    try {
+        const { senderName } = req.body;
+        const {id} = req.params;
+
+        await sendEmailForConfirmingOrder(senderName);
+        await Proposals.findOneAndUpdate(
+            { id },
+            {orderConfirmed: true},
+            {new: true}
+        );  
+
+        return res.status(201).json({
+            message: `Email for order confirmation sent successfully to ${senderName}`,
+        });
+    }
+
+    catch (error) {
+        console.error('Error sending email for proposal:', error);
+        return res.status(500).json({
+            message: 'Error sending email for proposal for placing order',
+            error: error.message
+        });
+    }
+})
 
 export default router;

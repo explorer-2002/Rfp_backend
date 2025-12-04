@@ -87,3 +87,30 @@ export const getEmailTemplate = (requirements) => {
                         </html>
                         `
 }
+
+export const getEmailTemplateForPlacingOrder = (senderName) => {
+
+    return `
+            <html>
+                <head>
+                    <meta charset="UTF-8">
+                </head>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+
+                    <h2 style="color: #2c3e50; margin-bottom: 20px;">Congrations 🎉</h2>
+
+                    <p>Dear ${senderName}</p>
+
+                    <p>We are glad to inform you that we are giving this order to you, please provide the services as you promised</p>
+
+                    <p>
+                        Best regards,<br>
+                                Sanyam Jain<br>
+                                    Dev Solutions
+                                </p>
+
+                            </body>
+                        </html>
+                        `
+}
+

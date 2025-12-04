@@ -42,6 +42,11 @@ const proposalSchema = new mongoose.Schema({
     aiAnalysis: {
         score: Number,
         summary: String
+    },
+
+    orderConfirmed: {
+        type: Boolean,
+        default: false
     }
 
 }, {
