@@ -43,10 +43,9 @@ const getProposalDetailsFromEmail = async (emailData) => {
     return JSON.parse(result.text.substring(13, result.text.length - 3));
 };
 
-router.get('/:id', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const { id } = req.params;
-        const proposalsForRfp = await Proposals.findById(id).sort({ createdAt: -1 });
+        const proposalsForRfp = await Proposals.find({}).sort({ createdAt: -1 });
 
         return res.status(201).json({
             message: 'Vendors fetched successfully',
