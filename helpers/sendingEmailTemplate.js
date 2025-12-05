@@ -120,7 +120,7 @@ export const getEmailTemplateForPlacingOrder = (senderName) => {
                 </head>
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
 
-                    <h2 style="color: #2c3e50; margin-bottom: 20px;">Congrations 🎉</h2>
+                    <h2 style="color: #2c3e50; margin-bottom: 20px;">Congratulations 🎉</h2>
 
                     <p>Dear ${senderName}</p>
 
