@@ -82,7 +82,9 @@ router.post('/', async (req, res) => {
             const rfpDetails = await Rfp.findOne({});
             const proposalObject = await getProposalDetailsFromEmail(fullEmail?.html, rfpDetails);
 
-            if (!proposalObject) {
+            console.log('Extracted Proposal Object:', proposalObject);
+
+            if (!proposalObject || Object.keys(proposalObject).length === 0) {
                 await sendEmailForRequestingProposalResend()
 
                 return res.status(500).json({
@@ -93,7 +95,7 @@ router.post('/', async (req, res) => {
             }
 
             const existingProposal = await Proposals.findOne({ sender: proposalObject?.sender });
-            
+
             if (existingProposal) {
                 await Proposals.findOneAndUpdate(
                     { sender: proposalObject?.sender },
