@@ -24,6 +24,15 @@ const fetchFullEmailFromResend = async (emailId) => {
     }
 };
 
+const fetchEmailAttachmentsFromResend = async (emailId) => {
+
+    const { data, error } = await resend.attachments.receiving.list({
+        emailId: emailId,
+    });
+
+    console.log('Fetched attachments data from Resend: ', data);
+}
+
 const getProposalDetailsFromEmail = async (emailData, rfpDetails) => {
     const ai = new GoogleGenAI({
         apiKey: process.env.GEMINI_API_KEY
@@ -77,6 +86,8 @@ router.post('/', async (req, res) => {
             const email = payload?.data;
 
             const fullEmail = await fetchFullEmailFromResend(email?.email_id);
+            await fetchEmailAttachmentsFromResend(email?.email_id);
+            
             console.log('Full email fetched from Resend:', fullEmail);
             console.log('Attatchments: ', fullEmail?.attachments);
 
