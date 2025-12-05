@@ -24,10 +24,11 @@ const fetchFullEmailFromResend = async (emailId) => {
     }
 };
 
-const fetchEmailAttachmentsFromResend = async (emailId) => {
+const fetchEmailAttachmentsFromResend = async (emailId, id) => {
 
-    const { data, error } = await resend.attachments.receiving.list({
+    const { data, error } = await resend.attachments.receiving.get({
         emailId: emailId,
+        id: id
     });
 
     console.log('Fetched attachments data from Resend: ', data);
@@ -86,10 +87,11 @@ router.post('/', async (req, res) => {
             const email = payload?.data;
 
             const fullEmail = await fetchFullEmailFromResend(email?.email_id);
-            await fetchEmailAttachmentsFromResend(email?.email_id);
-            
+
             console.log('Full email fetched from Resend:', fullEmail);
             console.log('Attatchments: ', fullEmail?.attachments);
+
+            await fetchEmailAttachmentsFromResend(fullEmail?.id, fullEmail?.attachments[0]?.id);
 
             const rfpDetails = await Rfp.findOne({});
             const proposalObject = await getProposalDetailsFromEmail(fullEmail?.html, rfpDetails);
