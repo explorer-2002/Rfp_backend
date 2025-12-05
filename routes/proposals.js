@@ -4,7 +4,7 @@ import { systemPromptForAnalyzingProposalEmail } from '../helpers/systemPrompts.
 import { logtail } from '../helpers/logger.js';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
-import { resend, sendEmailForConfirmingOrder } from '../helpers/sendEmails.js';
+import { resend, sendEmailForConfirmingOrder, sendEmailForRequestingProposalResend } from '../helpers/sendEmails.js';
 import { Rfp } from '../models/rfp.js';
 
 dotenv.config();
@@ -82,6 +82,31 @@ router.post('/', async (req, res) => {
             const rfpDetails = await Rfp.findOne({});
             const proposalObject = await getProposalDetailsFromEmail(fullEmail?.html, rfpDetails);
 
+            if (!proposalObject) {
+                await sendEmailForRequestingProposalResend()
+
+                return res.status(500).json({
+                    message: 'No proposal details found in the email',
+                    data: []
+                });
+
+            }
+
+            const existingProposal = await Proposals.findOne({ sender: proposalObject?.sender });
+            
+            if (existingProposal) {
+                await Proposals.findOneAndUpdate(
+                    { sender: proposalObject?.sender },
+                    { emailBody: fullEmail?.text, ...proposalObject },
+                    { new: true }
+                );
+
+                return res.status(200).json({
+                    message: 'Proposal from this sender already exists',
+                    data: []
+                });
+            }
+
             console.log('Extracted Proposal Object:', proposalObject);
             const savedProposal = await Proposals.create({
                 emailBody: fullEmail?.text,
@@ -118,7 +143,7 @@ router.post('/', async (req, res) => {
 router.post('/placeOrder/:rfpId/:proposalId', async (req, res) => {
     try {
         const { senderName } = req.body;
-        const {rfpId, proposalId} = req.params;
+        const { rfpId, proposalId } = req.params;
 
         await sendEmailForConfirmingOrder(senderName);
         await Rfp.findByIdAndUpdate(
@@ -130,14 +155,14 @@ router.post('/placeOrder/:rfpId/:proposalId', async (req, res) => {
                     proposalId: proposalId
                 }
             },
-            {new: true}
+            { new: true }
         );
-        
+
         await Proposals.findOneAndUpdate(
             { id: proposalId },
-            {orderConfirmed: true},
-            {new: true}
-        );  
+            { orderConfirmed: true },
+            { new: true }
+        );
 
         return res.status(201).json({
             message: `Email for order confirmation sent successfully to ${senderName}`,

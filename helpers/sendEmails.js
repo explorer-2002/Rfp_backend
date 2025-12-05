@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 import dotenv from 'dotenv';
-import { getEmailTemplate, getEmailTemplateForPlacingOrder } from './sendingEmailTemplate.js';
+import { emailTemplateRequestingResend, getEmailTemplate, getEmailTemplateForPlacingOrder } from './sendingEmailTemplate.js';
 
 dotenv.config();
 
@@ -36,6 +36,23 @@ export const sendEmailForConfirmingOrder = async (senderName) => {
     });
 
     console.log('Email sent successfully!', data);
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+};
+
+export const sendEmailForRequestingProposalResend = async () => {
+  try {
+    const emailTemplate = emailTemplateRequestingResend();
+
+    const data = await resend.emails.send({
+      from: 'Acme <onboarding@resend.dev>', // MUST use this for testing
+      to: ['sanyamj924@gmail.com'], 
+      subject: 'Requesting Proposal Resend',
+      html: emailTemplate,
+    });
+
+    console.log('Resend request email sent successfully!', data);
   } catch (error) {
     console.error('Error sending email:', error);
   }
