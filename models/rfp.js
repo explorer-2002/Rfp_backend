@@ -21,13 +21,28 @@ const rfpSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
-  deadline: {
+  expectedDeliveryDate: {
     type: Date,
     required: true
   },
   proposalIds: {
     type: [String],
     default: []
+  },
+
+  orderPlaced: {
+    isPlaced: {
+      type: Boolean,
+      default: false
+    },
+
+    vendorName: {
+      type: String
+    },
+
+    proposalId: {
+      type: String
+    }
   }
 }, {
   timestamps: true 

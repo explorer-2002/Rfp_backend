@@ -24,10 +24,12 @@ const fetchFullEmailFromResend = async (emailId) => {
     }
 };
 
-const getProposalDetailsFromEmail = async (emailData) => {
+const getProposalDetailsFromEmail = async (emailData, rfpDetails) => {
     const ai = new GoogleGenAI({
         apiKey: process.env.GEMINI_API_KEY
     });
+
+    const systemInstruction = systemPromptForAnalyzingProposalEmail(rfpDetails)
 
     const result = await ai.models.generateContent({
         model: "gemini-2.5-flash",
@@ -35,7 +37,7 @@ const getProposalDetailsFromEmail = async (emailData) => {
             thinkingConfig: {
                 thinkingBudget: 0,
             },
-            systemInstruction: systemPromptForAnalyzingProposalEmail
+            systemInstruction: systemInstruction
         },
         contents: emailData
     });
@@ -60,6 +62,7 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Endpoint to handle incoming emails from Resend
 router.post('/', async (req, res) => {
     try {
         const payload = req.body;
@@ -76,7 +79,8 @@ router.post('/', async (req, res) => {
             const fullEmail = await fetchFullEmailFromResend(email?.email_id);
             console.log('Full email fetched from Resend:', fullEmail);
 
-            const proposalObject = await getProposalDetailsFromEmail(fullEmail?.html);
+            const rfpDetails = await Rfp.findOne({});
+            const proposalObject = await getProposalDetailsFromEmail(fullEmail?.html, rfpDetails);
 
             console.log('Extracted Proposal Object:', proposalObject);
             const savedProposal = await Proposals.create({
@@ -111,14 +115,26 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/placeOrder/:id', async (req, res) => {
+router.post('/placeOrder/:rfpId/:proposalId', async (req, res) => {
     try {
         const { senderName } = req.body;
-        const {id} = req.params;
+        const {rfpId, proposalId} = req.params;
 
         await sendEmailForConfirmingOrder(senderName);
+        await Rfp.findByIdAndUpdate(
+            rfpId,
+            {
+                orderPlaced: {
+                    isPlaced: true,
+                    vendorName: senderName,
+                    proposalId: proposalId
+                }
+            },
+            {new: true}
+        );
+        
         await Proposals.findOneAndUpdate(
-            { id },
+            { id: proposalId },
             {orderConfirmed: true},
             {new: true}
         );  

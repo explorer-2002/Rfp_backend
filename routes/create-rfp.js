@@ -71,7 +71,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const rfp = await Rfp.findById(id)?.lean() || {};
+        const rfp = await Rfp.findById(id) || {};
 
         return res.status(201).json({
             message: 'RFP data fetched successfully',
