@@ -87,7 +87,7 @@ router.post('/', async (req, res) => {
             if (!proposalObject || Object.keys(proposalObject).length === 0) {
                 await sendEmailForRequestingProposalResend()
 
-                return res.status(500).json({
+                return res.status(200).json({
                     message: 'No proposal details found in the email',
                     data: []
                 });
@@ -135,7 +135,7 @@ router.post('/', async (req, res) => {
 
     } catch (error) {
         console.error('Error fetching proposal:', error);
-        return res.status(500).json({
+        return res.status(200).json({
             message: 'Error saving proposal data',
             error: error.message
         });
