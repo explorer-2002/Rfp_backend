@@ -91,7 +91,7 @@ router.post('/', async (req, res) => {
             console.log('Full email fetched from Resend:', fullEmail);
             console.log('Attatchments: ', fullEmail?.attachments);
 
-            await fetchEmailAttachmentsFromResend(fullEmail?.id, fullEmail?.attachments[0]?.id);
+            await fetchEmailAttachmentsFromResend(email?.email_id, fullEmail?.attachments[0]?.id);
 
             const rfpDetails = await Rfp.findOne({});
             const proposalObject = await getProposalDetailsFromEmail(fullEmail?.html, rfpDetails);
